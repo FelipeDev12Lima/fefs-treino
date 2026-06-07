@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0d0f">
+<title>Forge — Treino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f;
+    --panel:#16161a;
+    --panel-2:#1d1d22;
+    --line:#2a2a30;
+    --txt:#e9e6df;
+    --muted:#8a8780;
+    --ember:#ff5b1f;
+    --ember-2:#ff8a3d;
+    --gold:#ffb347;
+    --green:#54d18c;
+    --warn:#ffcf5c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--bg);}
+  body{
+    font-family:'Barlow',sans-serif;
+    color:var(--txt);
+    min-height:100vh;
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(255,91,31,.12), transparent 60%),
+      radial-gradient(700px 600px at -10% 110%, rgba(255,138,61,.07), transparent 55%),
+      var(--bg);
+    padding-bottom:90px;
+  }
+
+  /* HEADER */
+  header{
+    position:sticky;top:0;z-index:30;
+    background:rgba(13,13,15,.85);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:16px 18px 12px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .flame{
+    width:32px;height:32px;border-radius:9px;
+    background:linear-gradient(160deg,var(--ember),var(--gold));
+    display:grid;place-items:center;font-size:18px;
+    box-shadow:0 0 18px rgba(255,91,31,.5);
+    flex-shrink:0;
+  }
+  .brand h1{
+    font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:.9;
+    background:linear-gradient(90deg,var(--txt),var(--gold));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:10px;line-height:1.4;}
+
+  /* TABS */
+  .tabs{
+    display:flex;gap:8px;overflow-x:auto;padding:14px 14px 10px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;border:1px solid var(--line);background:var(--panel);
+    color:var(--muted);border-radius:13px;padding:10px 13px;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+    letter-spacing:.5px;text-transform:uppercase;cursor:pointer;
+    transition:.18s;min-width:72px;text-align:center;position:relative;
+  }
+  .tab .d{font-size:10px;color:var(--muted);font-family:'Barlow',sans-serif;font-weight:600;letter-spacing:1px;margin-top:2px;}
+  .tab.active{
+    background:linear-gradient(150deg,rgba(255,91,31,.22),rgba(255,138,61,.08));
+    border-color:var(--ember);color:var(--txt);
+    box-shadow:0 0 0 1px rgba(255,91,31,.3),0 6px 18px rgba(255,91,31,.12);
+  }
+  .tab.active .d{color:var(--ember-2);}
+  .tab.today::after{
+    content:"";position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;
+    background:var(--green);box-shadow:0 0 8px var(--green);
+  }
+
+  /* CARDS */
+  main{padding:4px 14px;}
+  .daycard{display:none;animation:rise .32s ease;}
+  .daycard.active{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .dhead{display:flex;align-items:flex-start;justify-content:space-between;margin:8px 2px 12px;gap:8px;}
+  .dhead .t{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1.05;white-space:nowrap;}
+  .dhead .t span{color:var(--ember-2);}
+  .dhead .focus{color:var(--muted);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;text-align:right;line-height:1.5;padding-top:4px;}
+
+  /* PROGRESS */
+  .prog{height:8px;background:var(--panel-2);border-radius:20px;overflow:hidden;margin:0 2px 6px;border:1px solid var(--line);}
+  .prog i{display:block;height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--ember),var(--gold));transition:width .4s ease;}
+  .progtxt{font-size:11px;color:var(--muted);margin:0 2px 14px;letter-spacing:1px;}
+
+  /* EXERCISE ROW */
+  .ex{
+    display:flex;align-items:center;gap:13px;
+    background:var(--panel);border:1px solid var(--line);border-radius:15px;
+    padding:14px;margin-bottom:9px;cursor:pointer;
+    transition:.16s;user-select:none;
+  }
+  .ex:active{transform:scale(.983);opacity:.9;}
+  .ex.done{background:rgba(29,29,34,.7);border-color:rgba(84,209,140,.25);}
+  .box{
+    flex:0 0 27px;width:27px;height:27px;border-radius:8px;
+    border:2px solid var(--line);display:grid;place-items:center;transition:.16s;
+  }
+  .ex.done .box{background:var(--green);border-color:var(--green);}
+  .box svg{width:14px;height:14px;stroke:#0d0d0f;stroke-width:3.5;fill:none;opacity:0;transition:.16s;}
+  .ex.done .box svg{opacity:1;}
+  .exbody{flex:1;min-width:0;}
+  .exname{font-weight:600;font-size:15px;line-height:1.25;}
+  .ex.done .exname{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(138,135,128,.45);}
+  .exsets{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--ember-2);font-size:14px;letter-spacing:.5px;margin-top:3px;}
+  .extag{
+    display:inline-block;margin-top:6px;font-size:10.5px;letter-spacing:.3px;
+    padding:3px 8px;border-radius:6px;line-height:1.4;
+  }
+  .extag.warn{background:rgba(255,207,92,.1);color:var(--warn);border:1px solid rgba(255,207,92,.22);}
+  .extag.safe{background:rgba(84,209,140,.08);color:var(--green);border:1px solid rgba(84,209,140,.2);}
+
+  .note{
+    font-size:12.5px;color:var(--muted);line-height:1.6;
+    background:var(--panel);border:1px dashed var(--line);border-radius:13px;
+    padding:13px 15px;margin-top:6px;margin-bottom:6px;
+  }
+  .note b{color:var(--gold);}
+
+  /* NUTRITION */
+  .macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 2px 16px;}
+  .macro{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 8px;text-align:center;}
+  .macro .v{font-family:'Bebas Neue',sans-serif;font-size:25px;letter-spacing:1px;color:var(--gold);line-height:1;}
+  .macro .l{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
+
+  .meal{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px 16px;margin-bottom:10px;}
+  .meal h3{
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;
+    letter-spacing:1px;text-transform:uppercase;color:var(--ember-2);margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .meal ul{list-style:none;}
+  .meal li{font-size:14px;color:var(--txt);padding:5px 0 5px 18px;position:relative;line-height:1.4;}
+  .meal li::before{content:"";position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--ember);}
+  .meal li small{color:var(--muted);}
+
+  /* BOTTOM NAV */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:40;
+    background:rgba(13,13,15,.92);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);
+    display:flex;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:8px;
+  }
+  .navbtn{
+    flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    color:var(--muted);padding:11px;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;
+    font-size:14px;letter-spacing:1px;text-transform:uppercase;
+    cursor:pointer;transition:.16s;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+  }
+  .navbtn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;}
+  .navbtn.active{color:var(--txt);border-color:var(--ember);background:linear-gradient(150deg,rgba(255,91,31,.18),transparent);}
+  .navbtn.active svg{stroke:var(--ember-2);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* RESET */
+  .reset{
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    border-radius:12px;padding:11px 18px;font-size:12.5px;font-weight:600;
+    letter-spacing:.5px;cursor:pointer;display:block;margin:22px auto 12px;
+    transition:.16s;font-family:'Barlow',sans-serif;
+  }
+  .reset:active{border-color:var(--ember);color:var(--ember-2);}
+
+  /* FLASH */
+  .flash{
+    position:fixed;bottom:96px;left:50%;
+    transform:translateX(-50%) translateY(16px);
+    background:var(--green);color:#0d0d0f;
+    font-weight:700;font-size:13px;
+    padding:9px 20px;border-radius:30px;
+    opacity:0;transition:.28s;pointer-events:none;z-index:50;
+    letter-spacing:.5px;white-space:nowrap;
+  }
+  .flash.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .spacer{height:24px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="flame">🔥</div>
+    <div>
+      <h1>FORGE</h1>
+      <small>Felipe · 5 treinos + 2 cardio</small>
+    </div>
+  </div>
+  <p class="sub">Pós-recuperação do rádio · máquinas e polias · sem dor = pode progredir</p>
+</header>
+
+<!-- VIEW: TREINO -->
+<div class="view active" id="view-treino">
+  <div class="tabs" id="tabs"></div>
+  <main id="days"></main>
+  <button class="reset" onclick="resetWeek()">↻ Zerar a semana</button>
+  <div class="spacer"></div>
+</div>
+
+<!-- VIEW: DIETA -->
+<div class="view" id="view-dieta">
+  <main>
+    <div class="dhead" style="margin-top:14px;">
+      <div class="t">CORTE <span>103→92KG</span></div>
+    </div>
+    <div class="macros">
+      <div class="macro"><div class="v">2.450</div><div class="l">kcal / dia</div></div>
+      <div class="macro"><div class="v">195g</div><div class="l">Proteína</div></div>
+      <div class="macro"><div class="v">~0,5kg</div><div class="l">por semana</div></div>
+    </div>
+
+    <div class="meal">
+      <h3>☕ Café da manhã</h3>
+      <ul>
+        <li>4 ovos mexidos <small>(ou 3 ovos + 4 claras)</small></li>
+        <li>2 fatias de pão integral <small>ou 40g de aveia</small></li>
+        <li>1 fruta <small>(banana, mamão ou maçã)</small></li>
+        <li>Café preto sem açúcar</li>
+      </ul>
+    </div>
+
+    <div class="meal">
+      <h3>🍛 Almoço</h3>
+      <ul>
+        <li>4 colheres de arroz <small>(prefira integral se possível)</small></li>
+        <li>1 concha de feijão</li>
+        <li>180–200g de proteína <small>frango, patinho ou tilápia grelhados</small></li>
+        <li>Salada à vontade + 1 legume cozido</li>
+        <li>1 fio de azeite na salada</li>
+      </ul>
+    </div>
+
+    <div class="meal">
+      <h3>🍽️ Janta</h3>
+      <ul>
+        <li>3 colheres de arroz <small>ou 1 batata-doce média</small></li>
+        <li>1 concha de feijão</li>
+        <li>180–200g de proteína</li>
+        <li>Legumes e verduras à vontade</li>
+      </ul>
+    </div>
+
+    <div class="meal">
+      <h3>➕ Reforço (opcional)</h3>
+      <ul>
+        <li>1 dose de whey <small>após o treino</small></li>
+        <li>1 iogurte natural ou 2 ovos cozidos <small>se bater fome entre refeições</small></li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <b>Lógica do corte:</b> proteína alta (~195g/dia) preserva músculo enquanto perde gordura. Pese-se 1× por semana, em jejum, mesmo dia. O número oscila dia a dia por água e sal — o que importa é a média semanal caindo. Beba 3L+ de água por dia.
+    </div>
+    <div class="spacer"></div>
+  </main>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav>
+  <button class="navbtn active" id="nav-treino" onclick="switchView('treino')">
+    <svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>
+    Treino
+  </button>
+  <button class="navbtn" id="nav-dieta" onclick="switchView('dieta')">
+    <svg viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 3 3v8M7 3v7M10 3v7M17 3c-1.5 0-2 4-2 6s.5 3 2 3v9"/></svg>
+    Dieta
+  </button>
+</nav>
+
+<div class="flash" id="flash">Salvo ✓</div>
+
+<script>
+const STORE_KEY = 'forge_v2';
+
+const PLAN = [
+  {
+    key:'d1', tab:'SEG', label:'DIA 1', focus:'Pernas · Quadríceps', icon:'🦵',
+    exercises:[
+      {n:'Leg press 45°', s:'4 × 10–12 reps', tag:{t:'Substitui o agachamento livre',k:'safe'}},
+      {n:'Hack machine', s:'3 × 10–12 reps', tag:{t:'Carga controlada',k:'safe'}},
+      {n:'Cadeira extensora', s:'4 × 12–15 reps'},
+      {n:'Mesa flexora', s:'3 × 12 reps'},
+      {n:'Panturrilha no leg press / smith', s:'4 × 15 reps'},
+    ]
+  },
+  {
+    key:'d2', tab:'TER', label:'DIA 2', focus:'Costas · Post. ombro', icon:'🔙',
+    exercises:[
+      {n:'Puxada frontal — pegada neutra', s:'4 × 10–12 reps', tag:{t:'Pegada neutra protege o antebraço',k:'safe'}},
+      {n:'Remada na máquina (apoiada)', s:'4 × 10–12 reps', tag:{t:'Sem peso livre',k:'safe'}},
+      {n:'Remada baixa — triângulo', s:'3 × 10–12 reps'},
+      {n:'Pulldown / pullover na polia', s:'3 × 12–15 reps'},
+      {n:'Crucifixo invertido na máquina', s:'3 × 15 reps'},
+      {n:'Abdominal na máquina', s:'3 × 15 reps'},
+    ]
+  },
+  {
+    key:'d3', tab:'QUA', label:'DIA 3', focus:'Peito · Ombro', icon:'💪',
+    exercises:[
+      {n:'Chest press na máquina', s:'4 × 10–12 reps', tag:{t:'Não trave o cotovelo no fim',k:'warn'}},
+      {n:'Supino inclinado na máquina', s:'3 × 10–12 reps', tag:{t:'Amplitude sem dor',k:'warn'}},
+      {n:'Voador / peck deck', s:'4 × 12–15 reps', tag:{t:'Pouco estresse no antebraço',k:'safe'}},
+      {n:'Crossover na polia — leve', s:'3 × 15 reps'},
+      {n:'Desenvolvimento na máquina', s:'4 × 10–12 reps'},
+      {n:'Elevação lateral na máquina/polia', s:'4 × 12–15 reps'},
+    ]
+  },
+  {
+    key:'d4', tab:'QUI', label:'DIA 4', focus:'Pernas · Post. / Glúteo', icon:'🍑',
+    exercises:[
+      {n:'Cadeira flexora', s:'4 × 12 reps'},
+      {n:'Mesa flexora', s:'3 × 10–12 reps'},
+      {n:'Elevação pélvica na máquina/smith', s:'4 × 10–12 reps'},
+      {n:'Cadeira adutora + abdutora', s:'3 × 15 reps cada'},
+      {n:'Leg press (pés altos — foco glúteo)', s:'3 × 12 reps'},
+      {n:'Panturrilha sentado', s:'4 × 15 reps'},
+    ]
+  },
+  {
+    key:'d5', tab:'SEX', label:'DIA 5', focus:'Braços · Core', icon:'🦾',
+    exercises:[
+      {n:'Rosca scott na máquina', s:'3 × 12–15 reps', tag:{t:'Comece leve, suba sem dor',k:'warn'}},
+      {n:'Rosca martelo na polia — corda', s:'3 × 12–15 reps', tag:{t:'Pegada neutra é mais segura',k:'safe'}},
+      {n:'Tríceps na corda (polia)', s:'4 × 12–15 reps'},
+      {n:'Tríceps na máquina', s:'3 × 12 reps'},
+      {n:'Rosca de punho / antebraço — leve', s:'2 × 15 reps', tag:{t:'Reabilita o rádio — MUITO leve',k:'warn'}},
+      {n:'Prancha + abdominal', s:'3 séries'},
+    ]
+  },
+  {
+    key:'d6', tab:'SÁB', label:'CARDIO', focus:'Cardio ativo', icon:'🏃', cardio:true,
+    exercises:[
+      {n:'Esteira inclinada — caminhada rápida', s:'35–45 min', tag:{t:'Zona 2: consegue conversar',k:'safe'}},
+      {n:'OU bike / elíptico', s:'35–45 min'},
+      {n:'Alongamento + mobilidade geral', s:'10 min'},
+    ]
+  },
+  {
+    key:'d7', tab:'DOM', label:'CARDIO', focus:'Recuperação ativa', icon:'🚲', cardio:true,
+    exercises:[
+      {n:'Cardio livre (bike, caminhada, natação)', s:'35–45 min', tag:{t:'Natação excelente pós-lesão',k:'safe'}},
+      {n:'Mobilidade de cotovelo e punho', s:'10 min', tag:{t:'Mantém ganho da fisioterapia',k:'safe'}},
+    ]
+  },
+];
+
+// Domingo=0..Sábado=6  →  d7,d1,d2,d3,d4,d5,d6
+const jsDayMap = ['d7','d1','d2','d3','d4','d5','d6'];
+function todayKey(){ return jsDayMap[new Date().getDay()]; }
+
+let state = {};
+let activeDay = todayKey();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) state = JSON.parse(raw);
+    if(!state || typeof state !== 'object') state = {};
+  }catch(e){ state = {}; }
+}
+
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    showFlash();
+  }catch(e){}
+}
+
+function showFlash(){
+  const el = document.getElementById('flash');
+  el.classList.add('show');
+  clearTimeout(window._ft);
+  window._ft = setTimeout(() => el.classList.remove('show'), 1100);
+}
+
+function isDone(dk, i){ return !!(state[dk] && state[dk][i]); }
+
+function toggle(dk, i){
+  if(!state[dk]) state[dk] = {};
+  state[dk][i] = !state[dk][i];
+  saveState();
+  renderDay(dk);
+}
+
+function progress(d){
+  const total = d.exercises.length;
+  let done = 0;
+  for(let i = 0; i < total; i++) if(isDone(d.key, i)) done++;
+  return { done, total, pct: Math.round(done / total * 100) };
+}
+
+const checkIcon = '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>';
+
+function buildTabs(){
+  const wrap = document.getElementById('tabs');
+  wrap.innerHTML = '';
+  const tk = todayKey();
+  PLAN.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'tab'
+      + (d.key === activeDay ? ' active' : '')
+      + (d.key === tk ? ' today' : '');
+    btn.innerHTML = `${d.cardio ? '🏃' : d.icon}<div class="d">${d.tab}</div>`;
+    btn.onclick = () => {
+      activeDay = d.key;
+      buildTabs();
+      renderAll();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderAll(){
+  const wrap = document.getElementById('days');
+  wrap.innerHTML = '';
+  PLAN.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'daycard' + (d.key === activeDay ? ' active' : '');
+    card.id = 'card-' + d.key;
+    wrap.appendChild(card);
+    renderDay(d.key);
+  });
+}
+
+function renderDay(dk){
+  const d = PLAN.find(x => x.key === dk);
+  const card = document.getElementById('card-' + dk);
+  if(!card) return;
+  card.className = 'daycard' + (dk === activeDay ? ' active' : '');
+  const p = progress(d);
+
+  let html = `
+    <div class="dhead">
+      <div class="t">${d.icon} ${d.label}</div>
+      <div class="focus">${d.focus}</div>
+    </div>
+    <div class="prog"><i style="width:${p.pct}%"></i></div>
+    <div class="progtxt">${p.done} de ${p.total} · ${p.pct}% completo</div>
+  `;
+
+  d.exercises.forEach((ex, i) => {
+    const done = isDone(dk, i);
+    let tagHtml = '';
+    if(ex.tag){
+      const cls = ex.tag.k === 'safe' ? 'safe' : 'warn';
+      const icon = ex.tag.k === 'safe' ? '✓' : '⚠';
+      tagHtml = `<div class="extag ${cls}">${icon} ${ex.tag.t}</div>`;
+    }
+    html += `
+      <div class="ex${done ? ' done' : ''}" onclick="toggle('${dk}',${i})">
+        <div class="box">${checkIcon}</div>
+        <div class="exbody">
+          <div class="exname">${ex.n}</div>
+          <div class="exsets">${ex.s}</div>
+          ${tagHtml}
+        </div>
+      </div>`;
+  });
+
+  if(!d.cardio){
+    html += `<div class="note"><b>Regra de ouro:</b> dor com carga = pare. Treine na amplitude e peso que <b>não</b> doem. Suba a carga só quando o incômodo sumir. Descanso 60–90s nos braços / 90–120s nas pernas.</div>`;
+  }
+
+  card.innerHTML = html;
+}
+
+function switchView(v){
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.getElementById('nav-treino').classList.toggle('active', v === 'treino');
+  document.getElementById('nav-dieta').classList.toggle('active', v === 'dieta');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function resetWeek(){
+  if(!confirm('Zerar todos os checks da semana?')) return;
+  state = {};
+  localStorage.removeItem(STORE_KEY);
+  renderAll();
+}
+
+// INIT
+loadState();
+buildTabs();
+renderAll();
+</script>
+</body>
+</html>
